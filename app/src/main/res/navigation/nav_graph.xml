@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/chats_fragment">
+    <fragment
+        android:id="@+id/chats_fragment"
+        android:name="com.benjaminearley.chat.ui.chats.ChatsFragment"
+        android:label="Chat"
+        tools:layout="@layout/chats">
+        <action
+            android:id="@+id/action_open_chat"
+            app:destination="@id/chat_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_add_chat"
+            app:destination="@id/add_chat_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <dialog
+        android:id="@+id/add_chat_fragment"
+        android:name="com.benjaminearley.chat.ui.addChat.AddChatFragment"
+        android:label="Add Chat"
+        tools:layout="@layout/add_chat">
+        <action
+            android:id="@+id/action_open_new_chat"
+            app:destination="@id/chat_fragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </dialog>
+    <fragment
+        android:id="@+id/chat_fragment"
+        android:name="com.benjaminearley.chat.ui.chat.ChatFragment"
+        tools:layout="@layout/chat">
+        <argument
+            android:name="chatId"
+            app:argType="string" />
+        <argument
+            android:name="chatName"
+            app:argType="string" />
+    </fragment>
+</navigation>

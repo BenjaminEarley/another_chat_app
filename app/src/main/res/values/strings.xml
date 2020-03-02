@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Chat</string>
+    <string name="send">Send</string>
+    <string name="add_chat">Add Chat</string>
+    <string name="chat_name">Chat Name</string>
+    <string name="submit">Submit</string>
+    <string name="enter_chat_name">Enter Chat Name</string>
+    <string name="blank" translatable="false" />
+</resources>

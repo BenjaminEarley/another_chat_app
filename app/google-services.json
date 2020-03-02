@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "225673173218",
+    "firebase_url": "https://chat-2-45400.firebaseio.com",
+    "project_id": "chat-2-45400",
+    "storage_bucket": "chat-2-45400.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225673173218:android:af036fe2da5ed4d76926bb",
+        "android_client_info": {
+          "package_name": "com.benjaminearley.chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "225673173218-mg46a3t9nrik581o9l21h17nsd8i5etr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.benjaminearley.chat",
+            "certificate_hash": "644dbd66335499a88380b803784209761a81a663"
+          }
+        },
+        {
+          "client_id": "225673173218-sbnkpid682cdo54qehs558i5vp8fa05g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGysv2yhiDXcUWQxPsx11md_UWodQztTU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "225673173218-sbnkpid682cdo54qehs558i5vp8fa05g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
