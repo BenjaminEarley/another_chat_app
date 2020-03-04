@@ -14,12 +14,11 @@ import androidx.navigation.fragment.navArgs
 import com.benjaminearley.chat.ChatApplication
 import com.benjaminearley.chat.databinding.ChatBinding
 import com.benjaminearley.chat.ui.MainViewModel
-import com.benjaminearley.chat.util.divider
+import com.benjaminearley.chat.util.getDivider
 import com.benjaminearley.chat.util.hideKeyboard
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
-
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -27,24 +26,19 @@ class ChatFragment : Fragment() {
 
     private val args: ChatFragmentArgs by navArgs()
 
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel by viewModels<ChatViewModel> {
-        ChatApplication.INSTANCE.run {
-            ChatViewModelFactory(
-                getChatModel(),
-                getUserModel(),
-                args.chatId
-            )
-        }
+        val mainViewModel: MainViewModel by activityViewModels()
+        ChatViewModelFactory(
+            mainViewModel,
+            ChatApplication.INSTANCE.getChatModel(),
+            args.chatId
+        )
     }
 
     private var _binding: ChatBinding? = null
     private val binding get() = _binding!!
 
     init {
-        lifecycleScope.launchWhenStarted {
-            viewModel.getChatName().collect { mainViewModel.setChatTitle(it) }
-        }
         lifecycleScope.launchWhenStarted {
             viewModel.getMessageDraft().collect { binding.messageField.setText(it) }
         }
@@ -57,13 +51,13 @@ class ChatFragment : Fragment() {
     ): View? {
         _binding = ChatBinding.inflate(inflater, container, false)
 
-        mainViewModel.setChatTitle(args.chatName)
+        viewModel.setChatTitle(args.chatName)
 
         val chatAdapter = ChatAdapter()
 
         with(binding) {
             chat.apply {
-                addItemDecoration(divider)
+                addItemDecoration(getDivider())
                 adapter = chatAdapter
             }
 
@@ -94,5 +88,3 @@ class ChatFragment : Fragment() {
         binding.messageField.hideKeyboard()
     }
 }
-
-

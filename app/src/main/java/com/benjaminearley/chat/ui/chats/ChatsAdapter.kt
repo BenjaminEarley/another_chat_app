@@ -9,26 +9,25 @@ import com.benjaminearley.chat.R
 import com.benjaminearley.chat.databinding.ChatListItemBinding
 import com.benjaminearley.chat.util.inflater
 
-data class ChatListItem(val id: String, val name: String) {
+data class ChatsListItem(val id: String, val name: String) {
     companion object {
-        val DIFF_CALLBACK: DiffUtil.ItemCallback<ChatListItem> =
-            object : DiffUtil.ItemCallback<ChatListItem>() {
+        val DIFF_CALLBACK: DiffUtil.ItemCallback<ChatsListItem> =
+            object : DiffUtil.ItemCallback<ChatsListItem>() {
                 override fun areItemsTheSame(
-                    oldItem: ChatListItem,
-                    newItem: ChatListItem
+                    oldItem: ChatsListItem,
+                    newItem: ChatsListItem
                 ) = oldItem.id == newItem.id
 
                 override fun areContentsTheSame(
-                    oldItem: ChatListItem,
-                    newItem: ChatListItem
+                    oldItem: ChatsListItem,
+                    newItem: ChatsListItem
                 ) = oldItem == newItem
             }
     }
 }
 
-
-class ChatsAdapter(private val tapListener: (ChatListItem) -> Unit) :
-    ListAdapter<ChatListItem, ChatViewHolder>(ChatListItem.DIFF_CALLBACK) {
+class ChatsAdapter(private val tapListener: (ChatsListItem) -> Unit) :
+    ListAdapter<ChatsListItem, ChatViewHolder>(ChatsListItem.DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder =
         ChatViewHolder(ChatListItemBinding.inflate(parent.inflater(), parent, false))
@@ -47,7 +46,7 @@ class ChatViewHolder(private val chatListItemBinding: ChatListItemBinding) :
             chatItem.setOnClickListener(null)
         }
 
-    fun bindTo(item: ChatListItem, tapListener: (Int) -> Unit) =
+    fun bindTo(item: ChatsListItem, tapListener: (Int) -> Unit) =
         with(chatListItemBinding) {
             if (item.id == "top") {
                 itemView.findViewById<LinearLayout>(R.id.chat_item).layoutParams.height = 0

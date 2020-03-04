@@ -11,18 +11,19 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.first
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 class SplashActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<MainViewModel> {
-        ChatApplication.INSTANCE.run { MainViewModelFactory(getUserModel()) }
+        MainViewModelFactory(ChatApplication.INSTANCE.getChatModel())
     }
 
     init {
         lifecycleScope.launchWhenStarted {
-            if (viewModel.isAuthenticated()) {
+            if (viewModel.getLoginState().first()) {
                 startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                 finish()
             } else {

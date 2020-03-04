@@ -7,14 +7,15 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import arrow.core.None
 import arrow.core.Some
 import com.benjaminearley.chat.ChatApplication
 import com.benjaminearley.chat.R
 import com.benjaminearley.chat.databinding.AddChatBinding
+import com.benjaminearley.chat.ui.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -25,16 +26,14 @@ import kotlinx.coroutines.flow.collect
 class AddChatFragment : BottomSheetDialogFragment() {
 
     private val viewModel by viewModels<AddChatViewModel> {
-        AddChatViewModelFactory(ChatApplication.INSTANCE.getChatModel())
+        val mainViewModel: MainViewModel by activityViewModels()
+        AddChatViewModelFactory(mainViewModel, ChatApplication.INSTANCE.getChatModel())
     }
 
     private var _binding: AddChatBinding? = null
     private val binding get() = _binding!!
 
     init {
-        lifecycleScope.launchWhenStarted {
-            viewModel.getNavDirections().collect { findNavController().navigate(it) }
-        }
         lifecycleScope.launchWhenStarted {
             viewModel.getInputErrors()
                 .collect {
@@ -82,8 +81,6 @@ class AddChatFragment : BottomSheetDialogFragment() {
 
             return root
         }
-
-
     }
 
     override fun onDestroyView() {

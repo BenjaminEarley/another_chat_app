@@ -1,10 +1,11 @@
 package com.benjaminearley.chat.domain
 
-import com.google.firebase.Timestamp
+import java.util.Date
 
 data class Message(
     val id: String,
-    val userId: String,
-    val sentDate: Timestamp,
+    val user: User,
+    val isMyMessage: Boolean,
+    val sentDate: Date,
     val body: String
 )

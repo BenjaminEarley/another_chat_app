@@ -6,6 +6,7 @@ plugins {
     kotlin("kapt")
     androidx("navigation.safeargs.kotlin")
     id("com.google.gms.google-services")
+    id("org.jlleitschuh.gradle.ktlint") version ktlintVersion
 }
 
 android {
@@ -45,6 +46,10 @@ android {
         @Suppress("USELESS_CAST") val options = this as KotlinJvmOptions
         options.jvmTarget = "1.8"
     }
+}
+
+ktlint {
+    android.set(true)
 }
 
 dependencies {

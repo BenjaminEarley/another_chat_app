@@ -1,10 +1,10 @@
 package com.benjaminearley.chat.domain
 
-import com.google.firebase.Timestamp
+import java.util.Date
 
 data class Chat(
     val id: String,
     val name: String,
-    val addedDate: Timestamp,
-    val userIds: List<String>
+    val addedDate: Date,
+    val users: List<User>
 )

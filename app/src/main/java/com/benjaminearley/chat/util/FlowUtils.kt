@@ -38,7 +38,7 @@ fun Query.asFlow(): Flow<QuerySnapshot?> {
 }
 
 @ExperimentalCoroutinesApi
-fun DocumentReference.asFlow(): Flow<DocumentSnapshot> {
+fun DocumentReference.asFlow(): Flow<Option<DocumentSnapshot>> {
     return callbackFlow {
         val snapshotListener =
             addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
@@ -49,7 +49,7 @@ fun DocumentReference.asFlow(): Flow<DocumentSnapshot> {
                     )
                     return@addSnapshotListener
                 }
-                offer(documentSnapshot!!)
+                offer(documentSnapshot.toOption())
             }
         awaitClose {
             snapshotListener.remove()
@@ -74,7 +74,6 @@ fun DocumentReference.asOptionalFlow(): Flow<Option<DocumentSnapshot>> {
                 } else {
                     offer(None)
                 }
-
             }
         awaitClose {
             snapshotListener.remove()
@@ -102,5 +101,25 @@ inline fun <T, R> Flow<Option<T>>.mapSome(
     when (value) {
         None -> emit(None)
         is Some -> emit(Some(transform(value.t)))
+    }
+}
+
+@ExperimentalCoroutinesApi
+inline fun <T, R> Flow<Option<T>>.flatMapSome(
+    crossinline transform: suspend (value: T) -> Option<R>
+): Flow<Option<R>> = transform { value ->
+    when (value) {
+        None -> emit(None)
+        is Some -> emit(transform(value.t))
+    }
+}
+
+@ExperimentalCoroutinesApi
+inline fun <T, R : T> Flow<Option<T>>.catch(
+    crossinline transform: suspend () -> Option<R>
+): Flow<Option<T>> = transform { value ->
+    when (value) {
+        None -> emit(transform())
+        is Some -> emit(Some(value.t))
     }
 }

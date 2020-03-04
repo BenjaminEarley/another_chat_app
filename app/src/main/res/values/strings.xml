@@ -6,4 +6,7 @@
     <string name="submit">Submit</string>
     <string name="enter_chat_name">Enter Chat Name</string>
     <string name="blank" translatable="false" />
+    <string name="message_error">Error: Message Not Sent</string>
+    <string name="error">Error</string>
+    <string name="chat_deleted">Chat Has Been Deleted</string>
 </resources>

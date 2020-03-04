@@ -4,10 +4,10 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import com.benjaminearley.chat.domain.User
-import com.benjaminearley.chat.store.data.FSUser
+import com.benjaminearley.chat.store.data.StoreUser
 import com.benjaminearley.chat.util.asFlow
 import com.benjaminearley.chat.util.asOptionalFlow
-import com.benjaminearley.chat.util.mapSome
+import com.benjaminearley.chat.util.flatMapSome
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldValue
@@ -18,27 +18,17 @@ import com.google.firebase.firestore.ktx.toObjects
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
 class UserStore(private val db: FirebaseFirestore, private val firebaseAuth: FirebaseAuth) {
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    fun getCurrentUser(): Flow<Option<User>> {
-        try {
-            return firebaseAuth
-                .asFlow()
-                .map { authUser ->
-                    when (authUser) {
-                        is Some -> getUser(authUser.t.uid).first()
-                        None -> None
-                    }
-                }
-        } catch (e: FirebaseFirestoreException) {
-            throw e
-        }
+    @Suppress("unused")
+    private data class FSUser(
+        val id: String,
+        val displayName: String
+    ) {
+        constructor() : this("", "")
     }
 
     @FlowPreview
@@ -52,16 +42,17 @@ class UserStore(private val db: FirebaseFirestore, private val firebaseAuth: Fir
     }
 
     @ExperimentalCoroutinesApi
-    fun getUser(userId: String): Flow<Option<User>> {
+    fun getUser(userId: String): Flow<Option<StoreUser>> {
         try {
             return db
                 .collection("users")
                 .document(userId)
                 .asOptionalFlow()
-                .mapSome { data ->
+                .flatMapSome { data ->
                     data
-                        .toObject<FSUser>()!!
-                        .let { User(it.id, it.displayName) }
+                        .toObject<FSUser>()
+                        ?.let { Some(StoreUser(it.id, it.displayName)) }
+                        ?: None
                 }
         } catch (e: FirebaseFirestoreException) {
             throw e
@@ -69,7 +60,7 @@ class UserStore(private val db: FirebaseFirestore, private val firebaseAuth: Fir
     }
 
     @ExperimentalCoroutinesApi
-    fun getUsers(): Flow<List<User>> {
+    fun getUsers(): Flow<List<StoreUser>> {
         try {
             return db
                 .collection("users")
@@ -77,7 +68,7 @@ class UserStore(private val db: FirebaseFirestore, private val firebaseAuth: Fir
                 .map { data ->
                     data
                         ?.toObjects<FSUser>()
-                        ?.map { User(it.id, it.displayName) }
+                        ?.map { StoreUser(it.id, it.displayName) }
                         ?: emptyList()
                 }
         } catch (e: FirebaseFirestoreException) {
@@ -86,11 +77,11 @@ class UserStore(private val db: FirebaseFirestore, private val firebaseAuth: Fir
     }
 
     @ExperimentalCoroutinesApi
-    suspend fun createUser(userId: String, displayName: String): User {
+    suspend fun createUser(userId: String, displayName: String): String {
         val user = hashMapOf(
             "id" to userId,
             "createdDate" to FieldValue.serverTimestamp(),
-            "name" to displayName
+            "displayName" to displayName
         )
         try {
             db
@@ -98,7 +89,7 @@ class UserStore(private val db: FirebaseFirestore, private val firebaseAuth: Fir
                 .document(userId)
                 .set(user)
                 .await()
-            return getUser(userId).first().orNull()!!
+            return userId
         } catch (e: FirebaseFirestoreException) {
             throw e
         }

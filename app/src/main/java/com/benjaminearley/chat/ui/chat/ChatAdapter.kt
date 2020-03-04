@@ -32,7 +32,6 @@ enum class MessageType {
     SENT, RECEIVED, HACK
 }
 
-
 class ChatAdapter :
     ListAdapter<ChatListItem, MessageViewHolder>(ChatListItem.DIFF_CALLBACK) {
 
@@ -54,7 +53,6 @@ class ChatAdapter :
             )
             else -> HackViewHolder(parent.inflate(R.layout.blank_view))
         }
-
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         getItem(position)?.let { holder.bindTo(it) }

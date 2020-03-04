@@ -1,13 +1,48 @@
 package com.benjaminearley.chat.util
 
+import android.app.Activity
 import android.graphics.drawable.Drawable
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.benjaminearley.chat.ChatApplication
+import com.benjaminearley.chat.R
 import com.bumptech.glide.Glide
 import com.google.android.material.elevation.ElevationOverlayProvider
+
+fun ViewGroup.inflate(layoutRes: Int): View =
+    LayoutInflater.from(context).inflate(layoutRes, this, false)
+
+fun ViewGroup.inflater(): LayoutInflater =
+    LayoutInflater.from(context)
+
+fun RecyclerView.getDivider() =
+    DividerItemDecoration(
+        context,
+        LinearLayoutManager.VERTICAL
+    ).also { decoration ->
+        ContextCompat
+            .getDrawable(context, R.drawable.divider_space)
+            ?.let { decoration.setDrawable(it) }
+    }
+
+fun EditText.hideKeyboard() {
+    val imm: InputMethodManager =
+        ChatApplication
+            .INSTANCE
+            .getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+
+    imm.hideSoftInputFromWindow(windowToken, 0)
+}
 
 fun ImageView.setSrcUrl(
     url: String,

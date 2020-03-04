@@ -5,9 +5,11 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import arrow.core.Either
 import com.benjaminearley.chat.ChatApplication
 import com.benjaminearley.chat.R
 import com.benjaminearley.chat.databinding.MainBinding
@@ -19,20 +21,20 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 
-
 @FlowPreview
 @ExperimentalCoroutinesApi
 class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<MainViewModel> {
-        ChatApplication.INSTANCE.run { MainViewModelFactory(getUserModel()) }
+        MainViewModelFactory(ChatApplication.INSTANCE.getChatModel())
     }
     private lateinit var binding: MainBinding
+    private lateinit var navController: NavController
 
     init {
         lifecycleScope.launchWhenStarted {
             viewModel.getSnackBars().collect { message ->
-                Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, getString(message), Snackbar.LENGTH_SHORT).show()
             }
         }
         lifecycleScope.launchWhenStarted {
@@ -45,6 +47,14 @@ class MainActivity : AppCompatActivity() {
                 if (!isLoggedIn) {
                     startActivity(Intent(this@MainActivity, SplashActivity::class.java))
                     finish()
+                }
+            }
+        }
+        lifecycleScope.launchWhenStarted {
+            viewModel.getNavDirections().collect {
+                when (it) {
+                    is Either.Left -> navController.navigate(it.a)
+                    is Either.Right -> navController.popBackStack()
                 }
             }
         }
@@ -78,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         binding.add.setOnClickListener {
@@ -91,6 +101,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }

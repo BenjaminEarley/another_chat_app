@@ -2,8 +2,13 @@ package com.benjaminearley.chat.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavDirections
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import com.benjaminearley.chat.R
+import com.benjaminearley.chat.model.ChatModel
 import com.benjaminearley.chat.store.UserStore
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,39 +19,33 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class MainViewModel(private val userStore: UserStore) : ViewModel() {
+class MainViewModel(private val chatModel: ChatModel) : ViewModel() {
 
-    private val loginState: BroadcastChannel<Boolean> = BroadcastChannel(Channel.BUFFERED)
     private val addPresses: BroadcastChannel<Unit> = BroadcastChannel(Channel.BUFFERED)
-    private val snackBars: BroadcastChannel<String> = BroadcastChannel(Channel.BUFFERED)
+    private val snackBars: BroadcastChannel<Int> = BroadcastChannel(Channel.BUFFERED)
     private val appBarTitles: BroadcastChannel<String> = BroadcastChannel(Channel.BUFFERED)
+    private val navDirections: BroadcastChannel<Either<NavDirections, Int>> =
+        BroadcastChannel(Channel.BUFFERED)
 
-    init {
-        viewModelScope.launch {
-            userStore
-                .getAuthentication()
-                .collect {
-                    loginState.offer(it.isDefined())
-                }
-        }
-    }
+    fun getNavDirections() = navDirections.asFlow()
 
-    suspend fun isAuthenticated() = userStore.getAuthentication().map { it.isDefined() }.first()
+    fun addNavDirections(navDirection: NavDirections) = navDirections.offer(Left(navDirection))
 
-    fun getLoginState() = loginState.asFlow()
+    fun popNavigation(destinationId: Int) = navDirections.offer(Right(destinationId))
+
+    fun getLoginState() = chatModel.isAuthenticated()
 
     fun addAddClick() = addPresses.offer(Unit)
 
     fun getAddClicks(): Flow<Unit> = addPresses.asFlow()
 
-    fun showSnackBar(message: String) = snackBars.offer(message)
+    fun showSnackBar(message: Int) = snackBars.offer(message)
 
-    fun getSnackBars(): Flow<String> = snackBars.asFlow()
+    fun getSnackBars(): Flow<Int> = snackBars.asFlow()
 
     fun setChatTitle(title: String) = appBarTitles.offer(title)
 
@@ -54,27 +53,27 @@ class MainViewModel(private val userStore: UserStore) : ViewModel() {
 
     fun createUser(user: FirebaseUser?) {
         if (user != null) {
-            viewModelScope.launch { userStore.createUser(user.uid, user.displayName ?: "") }
+            viewModelScope.launch { chatModel.createUser(user.uid, user.displayName ?: "") }
         } else {
-            showSnackBar("Error")
+            showSnackBar(R.string.error)
         }
     }
 
-
     override fun onCleared() {
         super.onCleared()
-        loginState.cancel()
         addPresses.cancel()
         snackBars.cancel()
+        appBarTitles.cancel()
+        navDirections.cancel()
     }
 }
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 @Suppress("UNCHECKED_CAST")
-class MainViewModelFactory(private val userStore: UserStore) :
+class MainViewModelFactory(private val chatModel: ChatModel) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return MainViewModel(userStore) as T
+        return MainViewModel(chatModel) as T
     }
 }

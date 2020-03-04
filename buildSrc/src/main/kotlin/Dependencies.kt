@@ -4,7 +4,7 @@ const val sdkMinVersion = 23
 const val buildToolVersion = "29.0.2"
 
 // Language
-const val kotlinVersion = "1.3.61"
+const val kotlinVersion = "1.3.70"
 const val coroutinesVersion = "1.3.3"
 
 // Android X Library
@@ -28,6 +28,8 @@ const val arrowVersion = "0.10.4"
 
 // Unit Test Library
 const val junitVersion = "4.12"
+
+const val ktlintVersion = "9.2.1"
 
 // Instrumentation Test Library
 const val androidxTestJunitVersion = "1.1.1"
